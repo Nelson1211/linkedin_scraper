@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 import time 
-import csv
 import pymongo
 
 def check_more_comments():
