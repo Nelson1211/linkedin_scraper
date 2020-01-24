@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 import time 
+import csv
 import pymongo
 
 def check_more_comments():
@@ -137,3 +138,8 @@ while check_more_comments():
 
     browser.find_element_by_xpath("//button[contains(@class,'button comments-comments-list__show-previous-button t-12 t-black t-normal hoverable-link-text')]").click()
     time.sleep(2)
+
+university_name = input("Enter the University you want profiles from: ")
+find_uni = col.find({'University': {'$eq': university_name}})
+for entries in find_uni:
+    print(entries)
