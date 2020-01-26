@@ -96,6 +96,7 @@ while check_more_comments():
             SCROLL_PAUSE_TIME = 0.5
             last_height = browser.execute_script("return document.body.scrollHeight")
             flag = 0
+            company = {}
             while not check_element(experience_element):
                 html = browser.find_element_by_tag_name('html')
                 html.send_keys(Keys.PAGE_DOWN)
@@ -105,6 +106,11 @@ while check_more_comments():
                     flag = 1
                     break
                 last_height = new_height
+            while check_element("//button[contains(@class,'pv-profile-section__see-more-inline pv-profile-section__text-truncate-toggle link link-without-hover-state')]"):
+                browser.find_element_by_xpath("//button[contains(@class,'pv-profile-section__see-more-inline pv-profile-section__text-truncate-toggle link link-without-hover-state')]").click()
+                html = browser.find_element_by_tag_name('html')
+                html.send_keys(Keys.PAGE_DOWN)
+                time.sleep(SCROLL_PAUSE_TIME)
             if flag == 0:
                 experience_elements = browser.find_element_by_xpath('//*[@id="experience-section"]/ul')
                 experience_elements = experience_elements.find_elements_by_tag_name('li')
@@ -118,20 +124,24 @@ while check_more_comments():
                             break
                     if flag == 1:
                         break
-                    experience = experience.find_elements_by_xpath(".//*")[3]
-                    experiences.append(experience.text)
+                    company[experience.find_elements_by_xpath(".//*")[5].text.replace('.','')] = experience.find_elements_by_xpath(".//*")[3].text
                 if flag == 1:
+                    while check_element("//button[contains(@class,'pv-profile-section__see-more-inline pv-profile-section__text-truncate-toggle link link-without-hover-state')]"):
+                        browser.find_element_by_xpath("//button[contains(@class,'pv-profile-section__see-more-inline pv-profile-section__text-truncate-toggle link link-without-hover-state')]").click()
+                        time.sleep(2)
+                    company_name = browser.find_element_by_xpath("//div[contains(@class,'pv-entity__company-summary-info')]")
+                    company_name = company_name.find_elements_by_xpath(".//*")[2].text.replace('.','')
                     experience_elements = browser.find_element_by_xpath("//ul[contains(@class,'pv-entity__position-group mt2')]")
                     experience_elements = experience_elements.find_elements_by_tag_name('li')
                     for experience in experience_elements:
                         experiences.append(experience.find_elements_by_xpath(".//*")[9].text)
+                    company[company_name] = experiences
                 profile_dict = {}
                 profile_dict['Name'] = name
                 profile_dict['Location'] = location
                 profile_dict['Profile Link'] = link
                 profile_dict['Company'] = company
                 profile_dict['University'] = university
-                profile_dict['Experiences'] = experiences
                 x = col.insert_one(profile_dict)
             browser.close()
             browser.switch_to_window(current_tab)
@@ -139,7 +149,15 @@ while check_more_comments():
     browser.find_element_by_xpath("//button[contains(@class,'button comments-comments-list__show-previous-button t-12 t-black t-normal hoverable-link-text')]").click()
     time.sleep(2)
 
-university_name = input("Enter the University you want profiles from: ")
-find_uni = col.find({'University': {'$eq': university_name}})
-for entries in find_uni:
-    print(entries)
+print("Search by\n1. University\n2.Company")
+option = int(input())
+if option == 1:
+    university_name = input("Enter the University you want profiles from: ")
+    find_uni = col.find({'University': {'$eq': university_name}})
+    for entries in find_uni:
+        print(entries)
+else:
+    company_name = input("Enter the Company you want profiles from: ")
+    find_company = col.find({'Company.{}'.format(company_name): {'$exists': True}})
+    for entries in find_company:
+        print(entries)
