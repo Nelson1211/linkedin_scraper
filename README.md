@@ -10,8 +10,6 @@ These instructions will get you a copy of the project up and running on your loc
 
 Download and install Python 3(https://www.python.org/downloads/release/python-376/)
 
-Download and install Mongo DB from https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
-
 ### Installing
 
 Start by installing the requirements as follows:
